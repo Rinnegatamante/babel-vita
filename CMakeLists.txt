@@ -10,6 +10,14 @@ endif()
 
 project(babel C CXX)
 include("${VITASDK}/share/vita.cmake" REQUIRED)
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(sndfile REQUIRED IMPORTED_TARGET sndfile)
+pkg_check_modules(vorbisfile REQUIRED IMPORTED_TARGET vorbisfile)
+pkg_check_modules(freetype2 REQUIRED IMPORTED_TARGET freetype2)
+pkg_check_modules(libzip REQUIRED IMPORTED_TARGET libzip)
+pkg_check_modules(libpng REQUIRED IMPORTED_TARGET libpng)
+pkg_check_modules(libwebp REQUIRED IMPORTED_TARGET libwebp)
+pkg_check_modules(libjpeg REQUIRED IMPORTED_TARGET libjpeg)
 set(VITA_APP_NAME "Babel Rising 3D")
 set(VITA_TITLEID  "BABEL003D")
 set(VITA_MKSFOEX_FLAGS "-d ATTRIBUTE2=12")
@@ -25,8 +33,17 @@ add_executable(babel
   loader/ctype_patch.c
 )
 
+set_target_properties(babel PROPERTIES LINKER_LANGUAGE CXX)
+
 target_link_libraries(babel
   -Wl,--whole-archive pthread -Wl,--no-whole-archive
+  PkgConfig::sndfile
+  PkgConfig::vorbisfile
+  PkgConfig::freetype2
+  PkgConfig::libzip
+  PkgConfig::libpng
+  PkgConfig::libwebp
+  PkgConfig::libjpeg
   openal
   freetype
   png
@@ -52,7 +69,6 @@ target_link_libraries(babel
   m
   imgui
   vitaGL
-  stdc++
   vitashark
   SceShaccCgExt
   mathneon
@@ -71,7 +87,6 @@ target_link_libraries(babel
   SceFios2_stub
   SceGxm_stub
   SceIme_stub
-  SceLibcBridge_stub
   SceShaccCg_stub
   SceSysmodule_stub
   ScePower_stub
@@ -79,7 +94,7 @@ target_link_libraries(babel
   SceMotion_stub
   SceHid_stub
   SceVshBridge_stub
-  SceKernelDmacmgr_stub
+  SceKernelDmacMgr_stub
 )
 
 vita_create_self(eboot.bin babel UNSAFE)
@@ -92,3 +107,5 @@ vita_create_vpk(babel.vpk ${VITA_TITLEID} eboot.bin
        ${CMAKE_SOURCE_DIR}/livearea/startup.png sce_sys/livearea/contents/startup.png
        ${CMAKE_SOURCE_DIR}/livearea/template.xml sce_sys/livearea/contents/template.xml
 )
+
+set_property(SOURCE loader/so_util.c APPEND PROPERTY COMPILE_OPTIONS -Wno-error=return-mismatch -Wno-error=incompatible-pointer-types)

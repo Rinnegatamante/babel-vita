@@ -1596,7 +1596,7 @@ void *CallObjectMethodV(void *env, void *obj, int methodID, uintptr_t *args) {
 	int lang = -1;
 	switch (methodID) {
 	default:
-		return 0x34343434;
+		return (void *)(uintptr_t)0x34343434;
 	}
 }
 
@@ -1639,7 +1639,7 @@ void *CallStaticObjectMethodV(void *env, void *obj, int methodID, uintptr_t *arg
 		return "ux0:data/babel/Files";
 	case READ_FILE:
 		//sceClibPrintf("readFile %s\n", args[0]);
-		f = fopen(args[0], "rb");
+		f = fopen((const char *)args[0], "rb");
 		if (f) {
 			if (read_buf) {
 				free(read_buf);
